@@ -33,12 +33,12 @@ module WonderfulEditor
     # config.eager_load_paths << Rails.root.join("extras")
 
     # Don't generate system test files.
-    # config.generators.system_tests = nil
+    config.generators.system_tests = nil
     config.generators do |g|
       g.javascripts false
       g.stylesheets false
       g.helper false
-      g.template.engine false
+      g.template_engine false
       g.test_framework :rspec,
                         view_specs: false,
                         routing_specs: false,
