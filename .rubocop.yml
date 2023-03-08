@@ -8,4 +8,6 @@ inherit_from:
 
 AllCops:
   # SuggestExtensions: false
+  Exclude:
+    - db/migrate/*
   TargetRubyVersion: 2.7
