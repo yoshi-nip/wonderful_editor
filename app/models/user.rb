@@ -9,4 +9,5 @@ class User < ApplicationRecord
   include DeviseTokenAuth::Concerns::User
 
   has_many :articles, dependent: :restrict_with_exception
+  has_many :article_likes, dependent: :restrict_with_exception
 end
