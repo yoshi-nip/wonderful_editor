@@ -59,6 +59,8 @@ group :development do
   gem "spring"
   # modelにスキーマ情報をコメントアウトとして追加してくれるgem
   gem "annotate"
+  # ER図
+  gem "rails-erd"
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
