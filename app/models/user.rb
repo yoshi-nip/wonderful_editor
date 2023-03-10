@@ -8,6 +8,8 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
   include DeviseTokenAuth::Concerns::User
 
+  validates :name, presence:true
+
   has_many :articles, dependent: :restrict_with_exception
   has_many :article_likes, dependent: :restrict_with_exception
   has_many :comment, dependent: :restrict_with_exception
