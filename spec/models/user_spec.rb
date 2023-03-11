@@ -14,8 +14,8 @@ RSpec.describe User, type: :model do
     it "ユーザー作成に失敗" do
       # user = User.new(name: "foo", email: "foo@foo.com")
       user = build(:user, { name: "" })
-      # expect(user).to be_invalid
-      # expect(user.errors.errors[0].attribute).to eq :name
+      expect(user).to be_invalid
+      expect(user.errors.errors[0].attribute).to eq :name
       expect(user.errors.errors[0].type).to eq :blank
     end
   end
@@ -24,8 +24,8 @@ RSpec.describe User, type: :model do
     it "ユーザー作成に失敗" do
       # user = User.new(name: "foo", email: "foo@foo.com")
       user = build(:user, { password: "bla32" })
-      # expect(user).to be_invalid
-      # expect(user.errors.errors[0].attribute).to eq :password
+      expect(user).to be_invalid
+      expect(user.errors.errors[0].attribute).to eq :password
       expect(user.errors.errors[0].type).to eq :too_short
       # expect(user.errors.details[:account][0][:error]).to eq :blank
     end
