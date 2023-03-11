@@ -44,7 +44,7 @@ group :development, :test do
   gem "pry-rails"
   # テストのためのもの
   # gem "factory_bot", "~> 6.2", ">= 6.2.1"
-  gem 'factory_bot_rails', '~> 6.2'
+  gem "factory_bot_rails", "~> 6.2"
   gem "faker"
   gem "rspec-rails", "~> 6.0.0"
 end
