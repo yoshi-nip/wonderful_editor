@@ -10,6 +10,26 @@ RSpec.describe User, type: :model do
     end
   end
 
+  context "emailが空白の時" do
+    it "ユーザー作成に失敗" do
+      # user = User.new(name: "foo", email: "foo@foo.com")
+      user = build(:user, { email: "" })
+      expect(user).to be_invalid
+      expect(user.errors.errors[0].attribute).to eq :email
+      expect(user.errors.errors[0].type).to eq :blank
+    end
+  end
+
+  context "password空白の時" do
+    it "ユーザー作成に失敗" do
+      # user = User.new(name: "foo", email: "foo@foo.com")
+      user = build(:user, { password: "" })
+      expect(user).to be_invalid
+      expect(user.errors.errors[0].attribute).to eq :password
+      expect(user.errors.errors[0].type).to eq :blank
+    end
+  end
+
   context "nameが空白の時" do
     it "ユーザー作成に失敗" do
       # user = User.new(name: "foo", email: "foo@foo.com")
@@ -23,7 +43,7 @@ RSpec.describe User, type: :model do
   context "passwordが8文字以下" do
     it "ユーザー作成に失敗" do
       # user = User.new(name: "foo", email: "foo@foo.com")
-      user = build(:user, { password: "bla32" })
+      user = build(:user, { password: "bla322r" })
       expect(user).to be_invalid
       expect(user.errors.errors[0].attribute).to eq :password
       expect(user.errors.errors[0].type).to eq :too_short
