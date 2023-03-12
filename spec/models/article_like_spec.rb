@@ -14,7 +14,7 @@ RSpec.describe ArticleLike, type: :model do
       # user = User.new(name: "foo", email: "foo@foo.com")
       article_like = build(:article_like, { user_id: nil })
       expect(article_like).to be_invalid
-      expect(article_like.errors.errors[0].attribute).to eq :user_id
+      expect(article_like.errors.errors[0].attribute).to eq :user
       expect(article_like.errors.errors[0].type).to eq :blank
     end
   end
