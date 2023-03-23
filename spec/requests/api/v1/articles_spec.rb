@@ -1,4 +1,4 @@
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe "Article", type: :request do
   # users GET    /users(.:format)users#index {:format=>:json}
@@ -8,16 +8,17 @@ RSpec.describe "Article", type: :request do
   describe "GET /articles" do
     # subject { get users_path }
     subject { get(api_v1_articles_path) }
-    before { 3.times{ create(:article) }}
-    fit "記事の一覧を取得できる" do
+
+    before { create_list(:article, 3) }
+
+    it "記事の一覧を取得できる" do
       p(subject)
       res = JSON.parse(response.body)
-      binding.pry
       # res.length = 3
       expect(res.length).to eq 3
       # expect(res["id"].keys).to eq ["id", "account", "name", "created_at", "updated_at", "email"]
       # binding.pry
-      expect(response).to have_http_status(200)
+      expect(response).to have_http_status(:ok)
     end
   end
 end
