@@ -18,4 +18,4 @@ Metrics/BlockLength:
     - 'db/*'
 
 RSpec/MultipleExpectations:
-  Max: 3
+  Max: 5
