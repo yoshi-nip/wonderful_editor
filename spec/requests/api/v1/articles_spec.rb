@@ -31,16 +31,24 @@ RSpec.describe "Article", type: :request do
   describe "GET /articles/:id" do
     subject { get(api_v1_article_path(article_id)) }
 
-    let!(:article) { create(:article) }
-    let!(:article_id) { article.id }
+    context "指定したidのデータが返ってくること(200)" do
+      let(:article) { create(:article) }
+      let(:article_id) { article.id }
+      it "記事の詳細を取得できる" do
+        p(subject)
+        res = JSON.parse(response.body)
+        expect(res.length).to eq 5
+        expect(res.keys).to eq ["id", "title", "body", "updated_at", "user"]
+        expect(res["user"].keys).to eq ["id", "name", "email"]
+        expect(response).to have_http_status(:ok)
+      end
+    end
 
-    it "記事の詳細を取得できる" do
-      p(subject)
-      res = JSON.parse(response.body)
-      expect(res.length).to eq 5
-      expect(res.keys).to eq ["id", "title", "body", "updated_at", "user"]
-      expect(res["user"].keys).to eq ["id", "name", "email"]
-      expect(response).to have_http_status(:ok)
+    context "存在しないidを指定してレコードが見つからない" do
+      let(:article_id) { 100000 }
+      it "記事の詳細を取得できる" do
+        expect { subject }.to raise_error ActiveRecord::RecordNotFound
+      end
     end
   end
 end
