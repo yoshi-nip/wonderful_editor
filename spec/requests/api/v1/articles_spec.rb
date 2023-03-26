@@ -27,12 +27,14 @@ RSpec.describe "Article", type: :request do
       expect(response).to have_http_status(:ok)
     end
   end
+
   describe "GET /articles/:id" do
     subject { get(api_v1_article_path(article_id)) }
+
     let!(:article) { create(:article) }
     let!(:article_id) { article.id }
 
-    fit "記事の詳細を取得できる" do
+    it "記事の詳細を取得できる" do
       p(subject)
       res = JSON.parse(response.body)
       expect(res.length).to eq 5
