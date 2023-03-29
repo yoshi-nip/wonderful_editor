@@ -34,11 +34,14 @@ RSpec.describe "Article", type: :request do
     context "指定したidのデータが返ってくること(200)" do
       let(:article) { create(:article) }
       let(:article_id) { article.id }
-      it "記事の詳細を取得できる" do
+      it "記事詳細を取得" do
         p(subject)
         res = JSON.parse(response.body)
-        expect(res.length).to eq 5
         expect(res.keys).to eq ["id", "title", "body", "updated_at", "user"]
+        expect(res["id"]).to eq article.id
+        expect(res["title"]).to eq article.title
+        expect(res["body"]).to eq article.body
+        expect(res["updated_at"]).to be_present
         expect(res["user"].keys).to eq ["id", "name", "email"]
         expect(response).to have_http_status(:ok)
       end
@@ -46,7 +49,7 @@ RSpec.describe "Article", type: :request do
 
     context "存在しないidを指定してレコードが見つからない" do
       let(:article_id) { 100000 }
-      it "記事の詳細を取得できる" do
+      it "記事詳細を取得できない" do
         expect { subject }.to raise_error ActiveRecord::RecordNotFound
       end
     end
