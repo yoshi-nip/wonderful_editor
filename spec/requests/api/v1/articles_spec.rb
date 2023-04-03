@@ -54,4 +54,20 @@ RSpec.describe "Article", type: :request do
       end
     end
   end
+
+  describe "Post /articles/" do
+    subject { post(api_v1_articles_path, params: { article: article_params }) }
+
+    context "適切なパラメータをもとに記事が作成される" do
+      let(:article_params) { attributes_for(:article) }
+      let(:user) { create(:user) }
+      before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(user) }
+
+      it "現在のユーザをもとに記事が作成できる" do
+        subject
+        # post :create, params: { article: { title: "Test Article", body: "Lorem ipsum dolor sit amet" } }
+        expect(Article.last.user_id).to eq(user.id)
+      end
+    end
+  end
 end

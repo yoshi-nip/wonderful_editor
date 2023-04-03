@@ -4,7 +4,7 @@ FactoryBot.define do
     # account {"hoge"}
     # email {"hoge@hoge.com"}
     title { Faker::Lorem.sentence }
-    body { Faker::Lorem.paragraphs }
+    body { Faker::Lorem.sentence }
     user
   end
 end
