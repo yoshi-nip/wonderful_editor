@@ -17,10 +17,11 @@ module Api
       end
 
       private
-      #Storong Parameter
-      def article_params
-        params.require(:article).permit(:title, :body)
-      end
+
+        # Storong Parameter
+        def article_params
+          params.require(:article).permit(:title, :body)
+        end
     end
   end
 end

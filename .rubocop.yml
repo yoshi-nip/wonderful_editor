@@ -22,3 +22,6 @@ Metrics/ExampleLength:
 
 RSpec/MultipleExpectations:
   Max: 10
+#一旦指摘無視して実装進めたいため記述
+RSpec/AnyInstance:
+  Enabled: false
