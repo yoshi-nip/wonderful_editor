@@ -70,4 +70,26 @@ RSpec.describe "Article", type: :request do
       end
     end
   end
+
+  describe "PATCH /articles/:id" do
+    subject { patch(api_v1_article_path(article_id), params: { article: article_params }) }
+
+    context "適切なパラメータをもとに記事が更新される" do
+      let(:article) { create(:article) }
+      let(:article_id) { article.id }
+      let(:article_params) { { title: Faker::Lorem.sentence } }
+      # let(:user) { create(:user) }
+
+      # before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(user) }
+
+      fit "現在のユーザをもとに記事が作成できる" do
+        # post :create, params: { article: { title: "Test Article", body: "Lorem ipsum dolor sit amet" } }
+        #タイトルだけ変える想定
+        expect{ subject }.to change {article.reload.title}.from(article.title).to(article_params[:title]) &
+                         not_change {article.reload.body} &
+                         not_change {article.reload.created_at}
+        expect(response).to have_http_status(200)
+      end
+    end
+  end
 end
