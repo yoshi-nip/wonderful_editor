@@ -70,4 +70,35 @@ RSpec.describe "Article", type: :request do
       end
     end
   end
+
+  describe "PATCH /articles/:id" do
+    subject { patch(api_v1_article_path(article_id), params: { article: article_params }) }
+
+    let(:article_params) { { title: Faker::Lorem.sentence } }
+    let(:other_user) { create(:user) }
+    let(:user) { create(:user) }
+    before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(user) }
+
+    context "自分が所持している記事のレコードを更新するとき" do
+      let(:article) { create(:article, user: user) }
+      let(:article_id) { article.id }
+
+      it "記事が更新できる" do
+        # post :create, params: { article: { title: "Test Article", body: "Lorem ipsum dolor sit amet" } }
+        # タイトルだけ変える想定
+        expect { subject }.to change { article.reload.title }.from(article.title).to(article_params[:title]) &
+                              not_change { article.reload.body } &
+                              not_change { article.reload.created_at }
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context "自分が所持していない記事のレコードを更新しようとするとき" do
+      let(:article_id) { article.id }
+      let!(:article) { create(:article, user: other_user) }
+      it "記事が更新できない" do
+        expect { subject }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+  end
 end

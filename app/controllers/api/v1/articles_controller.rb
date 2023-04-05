@@ -16,6 +16,13 @@ module Api
         render json: article, serializer: Api::V1::ArticleSerializer
       end
 
+      def update
+        article = current_user.articles.find(params[:id])
+        # current_user.articles.create!(article_params)
+        article.update!(article_params)
+        render json: article, serializer: Api::V1::ArticleSerializer
+      end
+
       private
 
         # Storong Parameter
