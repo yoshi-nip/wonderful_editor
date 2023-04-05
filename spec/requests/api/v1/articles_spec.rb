@@ -83,7 +83,7 @@ RSpec.describe "Article", type: :request do
       let(:article) { create(:article, user: user) }
       let(:article_id) { article.id }
 
-      fit "記事が更新できる" do
+      it "記事が更新できる" do
         # post :create, params: { article: { title: "Test Article", body: "Lorem ipsum dolor sit amet" } }
         # タイトルだけ変える想定
         expect { subject }.to change { article.reload.title }.from(article.title).to(article_params[:title]) &
@@ -96,7 +96,7 @@ RSpec.describe "Article", type: :request do
     context "自分が所持していない記事のレコードを更新しようとするとき" do
       let(:article_id) { article.id }
       let!(:article) { create(:article, user: other_user) }
-      fit "記事が更新できない" do
+      it "記事が更新できない" do
         expect { subject }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
