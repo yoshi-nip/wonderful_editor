@@ -11,6 +11,7 @@ AllCops:
   Exclude:
   - vendor/bundle/**/*
   - db/migrate/*
+  - node_modules/node-sass
   TargetRubyVersion: 2.7
 
 Metrics/BlockLength:
