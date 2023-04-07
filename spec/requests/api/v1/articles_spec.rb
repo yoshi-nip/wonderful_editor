@@ -80,7 +80,7 @@ RSpec.describe "Article", type: :request do
     before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(user) }
 
     context "自分が所持している記事のレコードを更新するとき" do
-      let(:article) { create(:article, user: user) }
+      let(:article) { create(:article, user:) }
       let(:article_id) { article.id }
 
       it "記事が更新できる" do
@@ -110,7 +110,7 @@ RSpec.describe "Article", type: :request do
     before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(user) }
 
     context "自分が所持している記事を削除しようとするとき" do
-      let(:article) { create(:article, user: user) }
+      let(:article) { create(:article, user:) }
       let(:article_id) { article.id }
       it "任意の記事を削除できる" do
         expect { subject }.to change { Article.count }.by(0)
