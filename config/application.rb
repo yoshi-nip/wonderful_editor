@@ -47,7 +47,8 @@ module WonderfulEditor
                        request_specs: true
     end
     config.api_only = true
+    config.middleware.use ActionDispatch::Flash
     # protect_from_forgeryの設定
-    config.action_controller.default_protect_from_forgery = false
+    # config.action_controller.default_protect_from_forgery = false
   end
 end

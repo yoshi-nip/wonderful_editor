@@ -8,11 +8,16 @@ inherit_from:
 
 AllCops:
   # SuggestExtensions: false
+  TargetRubyVersion: 3.1.1
   Exclude:
-  - vendor/bundle/**/*
-  - db/migrate/*
-  - node_modules/node-sass
-  TargetRubyVersion: 2.7
+    - "node_modules/**/*" # rubocop config/default.yml
+    - "vendor/**/*" # rubocop config/default.yml
+    - "db/schema.rb"
+    - "bin/bundle"
+    - db/migrate/*
+  # Exclude:
+  # - vendor/bundle/**/*
+
 
 Metrics/BlockLength:
   Exclude:
@@ -25,4 +30,6 @@ RSpec/MultipleExpectations:
   Max: 10
 #一旦指摘無視して実装進めたいため記述
 RSpec/AnyInstance:
+  Enabled: false
+Style/GlobalVars:
   Enabled: false
