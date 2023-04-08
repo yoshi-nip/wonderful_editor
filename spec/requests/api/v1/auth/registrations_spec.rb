@@ -20,7 +20,7 @@ RSpec.describe "Api::V1::Auth::Registrations", type: :request do
 
       it "想定したヘッダー情報が返ってくる" do
         subject
-        expected_headers = ["token-type", "access-token", "client", "uid", "expiry"]
+        expected_headers = ["token-type", "access-token", "client", "uid", "expiry", "authorization"]
         expected_headers.each do |header_key|
           expect(response.header[header_key]).to be_present
         end
