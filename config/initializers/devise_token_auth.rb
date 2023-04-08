@@ -48,6 +48,7 @@ DeviseTokenAuth.setup do |config|
                            uid: "uid",
                            'token-type': "token-type",
                            authorization: "authorization" }
+
   # config.headers_names = {:'access-token' => 'access-token',
   #                        :'client' => 'client',
   #                        :'expiry' => 'expiry',
