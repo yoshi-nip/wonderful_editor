@@ -22,9 +22,10 @@ AllCops:
 Metrics/BlockLength:
   Exclude:
     - 'db/*'
-Metrics/ExampleLength:
-  Exclude:
-    - 'spec/requests/api/v1/*'
+# Metrics/ExampleLength:
+#   Exclude:
+#     - 'spec/requests/api/v1/*'
+#     - 'spec/requests/api/v1/**/*'
 
 RSpec/MultipleExpectations:
   Max: 10
