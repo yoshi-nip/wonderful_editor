@@ -101,4 +101,43 @@ RSpec.describe "Api::V1::Auth::Registrations", type: :request do
       end
     end
   end
+
+  describe "DELETE /api/v1/auth/sign_out" do
+    subject { delete(destroy_api_v1_user_session_path, headers:) }
+
+    context "ヘッダー情報が正しく、正常なdeleteメソッドが送られる時" do
+      let(:user) { create(:user) }
+      let!(:headers) { user.create_new_auth_token }
+      it "ログアウトが成功する" do
+        # ログイン状態を確認
+        # ログアウトのアクションを実行
+        # ログアウトの結果を確認
+        expect { subject }.to change { user.reload.tokens.present? }.from(true).to(false)
+        expect(response).to have_http_status(:ok) # ログアウト後のレスポンスステータスを確認
+      end
+    end
+
+    context "ヘッダー情報が正しくない時" do
+      let(:user) { create(:user) }
+      let!(:headers) {
+        { "access-token" => "1111",
+          "token-type" => "kbndk",
+          "client" => "rrrr",
+          "expiry" => "35353",
+          "uid" => "222",
+          "authorization" => "" }
+      }
+      it "ログアウトが失敗する" do
+        # ログイン状態を確認
+        # ログアウトのアクションを実行
+        # ログアウトの結果を確認
+        # expect {subject}.to change {user.reload.tokens.present?}.from(true).to(false)
+        subject
+        res = JSON.parse(response.body)
+        expect(res["success"]).to eq false
+        expect(res["errors"][0]).to eq "User was not found or was not logged in."
+        expect(response).to have_http_status(:not_found) # ログアウト後のレスポンスステータスを確認
+      end
+    end
+  end
 end
