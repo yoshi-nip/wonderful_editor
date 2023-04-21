@@ -14,7 +14,7 @@ RSpec.describe "Article", type: :request do
     let!(:article2) { create(:article, updated_at: 2.days.ago) }
     let!(:article3) { create(:article, title: "一番最初") }
 
-    it "記事の一覧を取得できる" do
+    fit "記事の一覧を取得できる" do
       p(subject)
       res = JSON.parse(response.body)
       # res.length = 3
@@ -34,7 +34,7 @@ RSpec.describe "Article", type: :request do
     context "指定したidのデータが返ってくること(200)" do
       let(:article) { create(:article) }
       let(:article_id) { article.id }
-      it "記事詳細を取得" do
+      fit "記事詳細を取得" do
         p(subject)
         res = JSON.parse(response.body)
         expect(res.keys).to eq ["id", "title", "body", "updated_at", "user"]
@@ -55,35 +55,62 @@ RSpec.describe "Article", type: :request do
     end
   end
 
-  describe "Post /articles/" do
-    subject { post(api_v1_articles_path, params: { article: article_params }) }
+  describe "POST /articles/" do
+    subject { post(api_v1_articles_path, params: { article: article_params } ,headers:) }
+    let(:user) { create(:user) }
+    let(:article_params) { attributes_for(:article) }
 
-    context "適切なパラメータをもとに記事が作成される" do
-      let(:article_params) { attributes_for(:article) }
-      let(:user) { create(:user) }
-      before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(user) }
-
-      it "現在のユーザをもとに記事が作成できる" do
+    context "ログインユーザーの時、適切なパラメータをもとに記事が作成される" do
+      let!(:headers) { user.create_new_auth_token }
+      # before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_api_v1_user).and_return(user) }
+      fit "現在のユーザをもとに記事が作成できる" do
         subject
-        # post :create, params: { article: { title: "Test Article", body: "Lorem ipsum dolor sit amet" } }
         expect(Article.last.user_id).to eq(user.id)
+        expect(response).to have_http_status(:ok)
+      end
+
+      fit "想定したヘッダー情報が返ってくる" do
+        subject
+        expected_headers = ["token-type", "access-token", "client", "uid", "expiry", "authorization"]
+        expected_headers.each do |header_key|
+          expect(response.header[header_key]).to be_present
+        end
+      end
+    end
+
+    context "token情報が違う時時、記事が作成されない" do
+      let!(:headers) {
+        { "access-token" => "1111",
+          "token-type" => "kbndk",
+          "client" => "rrrr",
+          "expiry" => "35353",
+          "uid" => "222",
+          "authorization" => "" }
+      }
+      fit "エラーが起きる" do
+        subject
+        binding.pry
+        res = JSON.parse(response.body)
+        expect(response).to have_http_status(401)
+        expect(res["errors"][0]).to eq "You need to sign in or sign up before continuing."
       end
     end
   end
 
   describe "PATCH /articles/:id" do
-    subject { patch(api_v1_article_path(article_id), params: { article: article_params }) }
+    subject { patch(api_v1_article_path(article_id), params: { article: article_params } ,headers:) }
 
     let(:article_params) { { title: Faker::Lorem.sentence } }
     let(:other_user) { create(:user) }
     let(:user) { create(:user) }
-    before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(user) }
+    # before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_api_v1_user).and_return(user) }
 
     context "自分が所持している記事のレコードを更新するとき" do
+      let!(:headers) { user.create_new_auth_token }
       let(:article) { create(:article, user:) }
       let(:article_id) { article.id }
 
-      it "記事が更新できる" do
+      fit "記事が更新できる" do
         # post :create, params: { article: { title: "Test Article", body: "Lorem ipsum dolor sit amet" } }
         # タイトルだけ変える想定
         expect { subject }.to change { article.reload.title }.from(article.title).to(article_params[:title]) &
@@ -91,37 +118,74 @@ RSpec.describe "Article", type: :request do
                               not_change { article.reload.created_at }
         expect(response).to have_http_status(:ok)
       end
+
+      fit "想定したヘッダー情報が返ってくる" do
+        subject
+        expected_headers = ["token-type", "access-token", "client", "uid", "expiry", "authorization"]
+        expected_headers.each do |header_key|
+          expect(response.header[header_key]).to be_present
+        end
+      end
+    end
+
+    context "token情報が違う時時、記事が作成されない" do
+      let(:article) { create(:article, user:) }
+      let(:article_id) { article.id }
+      let!(:headers) {
+        { "access-token" => "1111",
+          "token-type" => "kbndk",
+          "client" => "rrrr",
+          "expiry" => "35353",
+          "uid" => "222",
+          "authorization" => "" }
+      }
+      fit "エラーが起きる" do
+        subject
+        binding.pry
+        res = JSON.parse(response.body)
+        expect(response).to have_http_status(401)
+        expect(res["errors"][0]).to eq "You need to sign in or sign up before continuing."
+      end
     end
 
     context "自分が所持していない記事のレコードを更新しようとするとき" do
       let(:article_id) { article.id }
       let!(:article) { create(:article, user: other_user) }
-      it "記事が更新できない" do
+      let!(:headers) { user.create_new_auth_token }
+      fit "記事が更新できない" do
         expect { subject }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
   end
 
   describe "DELETE /articles/:id" do
-    subject { delete(api_v1_article_path(article_id)) }
+    subject { delete(api_v1_article_path(article_id),headers:) }
 
     let(:other_user) { create(:user) }
     let(:user) { create(:user) }
-    before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(user) }
+    let!(:headers) { user.create_new_auth_token }
+    # before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_api_v1_user).and_return(user) }
 
     context "自分が所持している記事を削除しようとするとき" do
       let(:article) { create(:article, user:) }
       let(:article_id) { article.id }
-      it "任意の記事を削除できる" do
+      fit "任意の記事を削除できる" do
         expect { subject }.to change { Article.count }.by(0)
         expect(response).to have_http_status(:ok)
+      end
+      fit "想定したヘッダー情報が返ってくる" do
+        subject
+        expected_headers = ["token-type", "access-token", "client", "uid", "expiry", "authorization"]
+        expected_headers.each do |header_key|
+          expect(response.header[header_key]).to be_present
+        end
       end
     end
 
     context "自分が所持していない記事を削除しようとするとき" do
       let(:article) { create(:article, user: other_user) }
       let(:article_id) { article.id }
-      it "任意の記事を削除できない" do
+      fit "任意の記事を削除できない" do
         expect { subject }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
