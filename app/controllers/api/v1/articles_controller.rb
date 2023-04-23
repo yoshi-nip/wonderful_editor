@@ -1,7 +1,7 @@
 module Api
   module V1
     class ArticlesController < BaseApiController
-      skip_before_action :authenticate_api_v1_user! , only: %i[ index show]
+      skip_before_action :authenticate_api_v1_user!, only: %i[index show]
 
       def index
         articles = Article.order(updated_at: :desc)
