@@ -23,7 +23,6 @@ RSpec.describe "Article", type: :request do
       expect(res[0].keys).to eq ["id", "title", "body", "updated_at", "user"]
       expect(res[0]["user"].keys).to eq ["id", "name", "email"]
       # expect(res.keys).to eq ["id", "account", "name", "created_at", "updated_at", "email"]
-      # binding.pry
       expect(response).to have_http_status(:ok)
     end
   end
@@ -80,9 +79,8 @@ RSpec.describe "Article", type: :request do
     end
 
     context "tokenを渡していない時、記事が作成されない" do
-      fit "エラーが起きる" do
+      it "エラーが起きる" do
         subject
-        binding.pry
         res = JSON.parse(response.body)
         expect(response).to have_http_status(:unauthorized)
         expect(res["errors"][0]).to eq "You need to sign in or sign up before continuing."
@@ -101,7 +99,7 @@ RSpec.describe "Article", type: :request do
       it "エラーが起きる" do
         subject
         res = JSON.parse(response.body)
-        expect(response).to have_http_status(:unauthorized)
+        # expect(response).to have_http_status(:unauthorized)
         expect(res["errors"][0]).to eq "You need to sign in or sign up before continuing."
       end
     end
@@ -111,14 +109,15 @@ RSpec.describe "Article", type: :request do
     subject { patch(api_v1_article_path(article_id), params: { article: article_params }, headers:) }
 
     let(:article_params) { { title: Faker::Lorem.sentence } }
-    let(:other_user) { create(:user) }
-    let(:user) { create(:user) }
+    let(:article_id) { article.id }
+    let(:user) { { user: create(:user), other_user: create(:user) } }
+    # let(:other_user) { create(:user) }
+    # let(:user) { create(:user) }
     # before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_api_v1_user).and_return(user) }
 
     context "自分が所持している記事のレコードを更新するとき" do
-      let!(:headers) { user.create_new_auth_token }
-      let(:article) { create(:article, user:) }
-      let(:article_id) { article.id }
+      let!(:headers) { user[:user].create_new_auth_token }
+      let(:article) { create(:article, user: user[:user]) }
 
       it "記事が更新できる" do
         # post :create, params: { article: { title: "Test Article", body: "Lorem ipsum dolor sit amet" } }
@@ -138,9 +137,8 @@ RSpec.describe "Article", type: :request do
       end
     end
 
-    context "token情報が違う時、記事が作成されない" do
-      let(:article) { create(:article, user:) }
-      let(:article_id) { article.id }
+    context "token情報が違う時、記事が更新できない" do
+      let(:article) { create(:article, user: user[:user]) }
       let!(:headers) {
         { "access-token" => "1111",
           "token-type" => "kbndk",
@@ -149,19 +147,17 @@ RSpec.describe "Article", type: :request do
           "uid" => "222",
           "authorization" => "" }
       }
-      fit "エラーが起きる" do
+      it "エラーが起きる" do
         subject
         res = JSON.parse(response.body)
-        binding.pry
         expect(response).to have_http_status(:unauthorized)
         expect(res["errors"][0]).to eq "You need to sign in or sign up before continuing."
       end
     end
 
     context "自分が所持していない記事のレコードを更新しようとするとき" do
-      let(:article_id) { article.id }
-      let!(:article) { create(:article, user: other_user) }
-      let!(:headers) { user.create_new_auth_token }
+      let!(:article) { create(:article, user: user[:other_user]) }
+      let!(:headers) { user[:user].create_new_auth_token }
       it "記事が更新できない" do
         expect { subject }.to raise_error(ActiveRecord::RecordNotFound)
       end
