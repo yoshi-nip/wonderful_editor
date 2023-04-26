@@ -55,17 +55,20 @@ RSpec.describe "Article", type: :request do
   end
 
   describe "POST /articles/" do
-    subject { post(api_v1_articles_path, params: { article: article_params }, headers:) }
+    subject { post(api_v1_articles_path, params: { article: article_params,status: status_params }, headers:) }
 
     let(:user) { create(:user) }
     let(:article_params) { attributes_for(:article) }
+    # let(:article_params) { attributes_for(:article).merge(status: status_params) }
 
     context "ログインユーザーの時、適切なパラメータをもとに記事が作成される" do
       let!(:headers) { user.create_new_auth_token }
+      let(:status_params) { :draft }
       # before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_api_v1_user).and_return(user) }
       it "現在のユーザをもとに記事が作成できる" do
         subject
         expect(Article.last.user_id).to eq(user.id)
+        binding.pry
         expect(response).to have_http_status(:ok)
       end
 
@@ -78,6 +81,32 @@ RSpec.describe "Article", type: :request do
       end
     end
 
+    context "新規作成して、下書きを保存する場合(paramsが(status: draft))" do
+      let!(:headers) { user.create_new_auth_token }
+      let(:status_params) { :draft }
+      # before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_api_v1_user).and_return(user) }
+      fit "statusがdraftとして保存される" do
+        binding.pry
+        subject
+        expect(Article.last.status).to eq("draft")
+        binding.pry
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context "新規作成して、公開記事を保存する場合(paramsが(status: published))" do
+      let!(:headers) { user.create_new_auth_token }
+      let(:status_params) { :published }
+      # before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_api_v1_user).and_return(user) }
+      fit "statusがpublishedとして保存される" do
+        subject
+        expect(Article.last.status).to eq("published")
+        binding.pry
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    #異常系テスト
     context "tokenを渡していない時、記事が作成されない" do
       it "エラーが起きる" do
         subject
@@ -103,6 +132,8 @@ RSpec.describe "Article", type: :request do
         expect(res["errors"][0]).to eq "You need to sign in or sign up before continuing."
       end
     end
+
+
   end
 
   describe "PATCH /articles/:id" do

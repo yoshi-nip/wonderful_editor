@@ -14,6 +14,9 @@ module Api
       end
 
       def create
+        status = params[:status] || :draft # デフォルトはdraft
+        article_params.merge!(status: status)
+
         article = current_api_v1_user.articles.create!(article_params)
         render json: article, serializer: Api::V1::ArticleSerializer
       end
@@ -35,7 +38,7 @@ module Api
 
         # Storong Parameter
         def article_params
-          params.require(:article).permit(:title, :body)
+          params.require(:article).permit(:title, :body).merge(status: params[:status] || :draft)
         end
     end
   end
