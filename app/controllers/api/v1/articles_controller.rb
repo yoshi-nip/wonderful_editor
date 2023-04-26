@@ -12,6 +12,7 @@ module Api
         article = Article.published.find(params[:id])
         render json: article, serializer: Api::V1::ArticleSerializer
       end
+
       def create
         article = current_api_v1_user.articles.create!(article_params)
         render json: article, serializer: Api::V1::ArticleSerializer
@@ -34,7 +35,7 @@ module Api
 
         # Storong Parameter
         def article_params
-          params.require(:article).permit(:title, :body,:status)
+          params.require(:article).permit(:title, :body, :status)
         end
     end
   end
