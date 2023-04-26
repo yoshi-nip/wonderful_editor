@@ -74,15 +74,19 @@ RSpec.describe "Article", type: :request do
     subject { post(api_v1_articles_path, params: { article: article_params }, headers:) }
 
     let(:user) { create(:user) }
-    let(:article_params) { attributes_for(:article) }
+    let(:article_draft_or_published) {{draft: attributes_for(:article,:draft),published: attributes_for(:article,:published)}}
+    # let(:article_params) { attributes_for(:article,:published) }
     # let(:article_params) { attributes_for(:article).merge(status: status_params) }
 
     context "ログインユーザーの時、適切なパラメータをもとに記事が作成される" do
       let!(:headers) { user.create_new_auth_token }
+      let(:article_params) { article_draft_or_published[:draft] }
       # before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_api_v1_user).and_return(user) }
-      it "現在のユーザをもとに記事が作成できる" do
+      fit "現在のユーザをもとに記事が作成できる" do
         subject
+        binding.pry
         expect(Article.last.user_id).to eq(user.id)
+        expect(Article.last.status).to eq("draft")
         expect(response).to have_http_status(:ok)
       end
 
@@ -92,6 +96,20 @@ RSpec.describe "Article", type: :request do
         expected_headers.each do |header_key|
           expect(response.header[header_key]).to be_present
         end
+      end
+    end
+
+    context "公開ステータスの時も正常に保存できる" do
+      let!(:headers) { user.create_new_auth_token }
+      let(:article_params) { article_draft_or_published[:published] }
+      # before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_api_v1_user).and_return(user) }
+      fit "正常に保存できる" do
+
+        subject
+        binding.pry
+        expect(Article.last.user_id).to eq(user.id)
+        expect(Article.last.status).to eq("published")
+        expect(response).to have_http_status(:ok)
       end
     end
 

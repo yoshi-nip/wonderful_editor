@@ -5,7 +5,6 @@ module Api
 
       def index
         articles = Article.where(status: :published).order(updated_at: :desc)
-        binding.pry
         render json: articles, each_serializer: Api::V1::ArticlePreviewSerializer
       end
 
@@ -36,7 +35,7 @@ module Api
 
         # Storong Parameter
         def article_params
-          params.require(:article).permit(:title, :body)
+          params.require(:article).permit(:title, :body,:status)
         end
     end
   end
