@@ -55,7 +55,7 @@ RSpec.describe "Article", type: :request do
   end
 
   describe "POST /articles/" do
-    subject { post(api_v1_articles_path, params: { article: article_params, status: status_params }, headers:) }
+    subject { post(api_v1_articles_path, params: { article: article_params }, headers:) }
 
     let(:user) { create(:user) }
     let(:article_params) { attributes_for(:article) }
@@ -63,7 +63,6 @@ RSpec.describe "Article", type: :request do
 
     context "ログインユーザーの時、適切なパラメータをもとに記事が作成される" do
       let!(:headers) { user.create_new_auth_token }
-      let(:status_params) { :draft }
       # before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_api_v1_user).and_return(user) }
       it "現在のユーザをもとに記事が作成できる" do
         subject
@@ -80,31 +79,8 @@ RSpec.describe "Article", type: :request do
       end
     end
 
-    context "新規作成して、下書きを保存する場合(paramsが(status: draft))" do
-      let!(:headers) { user.create_new_auth_token }
-      let(:status_params) { :draft }
-      # before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_api_v1_user).and_return(user) }
-      it "statusがdraftとして保存される" do
-        subject
-        expect(Article.last.status).to eq("draft")
-        expect(response).to have_http_status(:ok)
-      end
-    end
-
-    context "新規作成して、公開記事を保存する場合(paramsが(status: published))" do
-      let!(:headers) { user.create_new_auth_token }
-      let(:status_params) { :published }
-      # before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_api_v1_user).and_return(user) }
-      it "statusがpublishedとして保存される" do
-        subject
-        expect(Article.last.status).to eq("published")
-        expect(response).to have_http_status(:ok)
-      end
-    end
-
     # 異常系テスト
     context "tokenを渡していない時、記事が作成されない" do
-      let(:status_params) { :draft }
       it "エラーが起きる" do
         subject
         res = JSON.parse(response.body)
@@ -114,7 +90,6 @@ RSpec.describe "Article", type: :request do
     end
 
     context "token情報が違う時、記事が作成されない" do
-      let(:status_params) { :draft }
       let!(:headers) {
         { "access-token" => "1111",
           "token-type" => "kbndk",
