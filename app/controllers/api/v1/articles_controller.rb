@@ -4,7 +4,8 @@ module Api
       skip_before_action :authenticate_api_v1_user!, only: %i[index show]
 
       def index
-        articles = Article.order(updated_at: :desc)
+        articles = Article.where(status: :published).order(updated_at: :desc)
+        binding.pry
         render json: articles, each_serializer: Api::V1::ArticlePreviewSerializer
       end
 
