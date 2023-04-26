@@ -36,7 +36,7 @@ RSpec.describe "Article", type: :request do
       it "記事詳細を取得" do
         p(subject)
         res = JSON.parse(response.body)
-        expect(res.keys).to eq ["id", "title", "body", "updated_at", "user"]
+        expect(res.keys).to eq ["id", "title", "body", "updated_at","status" ,"user"]
         expect(res["id"]).to eq article.id
         expect(res["title"]).to eq article.title
         expect(res["body"]).to eq article.body
@@ -108,6 +108,7 @@ RSpec.describe "Article", type: :request do
 
     #異常系テスト
     context "tokenを渡していない時、記事が作成されない" do
+      let(:status_params) { :draft }
       it "エラーが起きる" do
         subject
         res = JSON.parse(response.body)
@@ -117,6 +118,7 @@ RSpec.describe "Article", type: :request do
     end
 
     context "token情報が違う時、記事が作成されない" do
+      let(:status_params) { :draft }
       let!(:headers) {
         { "access-token" => "1111",
           "token-type" => "kbndk",
