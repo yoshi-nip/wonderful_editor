@@ -36,7 +36,7 @@ RSpec.describe "Article", type: :request do
       it "記事詳細を取得" do
         p(subject)
         res = JSON.parse(response.body)
-        expect(res.keys).to eq ["id", "title", "body", "updated_at","status" ,"user"]
+        expect(res.keys).to eq ["id", "title", "body", "updated_at", "status", "user"]
         expect(res["id"]).to eq article.id
         expect(res["title"]).to eq article.title
         expect(res["body"]).to eq article.body
@@ -55,7 +55,7 @@ RSpec.describe "Article", type: :request do
   end
 
   describe "POST /articles/" do
-    subject { post(api_v1_articles_path, params: { article: article_params,status: status_params }, headers:) }
+    subject { post(api_v1_articles_path, params: { article: article_params, status: status_params }, headers:) }
 
     let(:user) { create(:user) }
     let(:article_params) { attributes_for(:article) }
@@ -68,7 +68,6 @@ RSpec.describe "Article", type: :request do
       it "現在のユーザをもとに記事が作成できる" do
         subject
         expect(Article.last.user_id).to eq(user.id)
-        binding.pry
         expect(response).to have_http_status(:ok)
       end
 
@@ -85,11 +84,9 @@ RSpec.describe "Article", type: :request do
       let!(:headers) { user.create_new_auth_token }
       let(:status_params) { :draft }
       # before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_api_v1_user).and_return(user) }
-      fit "statusがdraftとして保存される" do
-        binding.pry
+      it "statusがdraftとして保存される" do
         subject
         expect(Article.last.status).to eq("draft")
-        binding.pry
         expect(response).to have_http_status(:ok)
       end
     end
@@ -98,15 +95,14 @@ RSpec.describe "Article", type: :request do
       let!(:headers) { user.create_new_auth_token }
       let(:status_params) { :published }
       # before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_api_v1_user).and_return(user) }
-      fit "statusがpublishedとして保存される" do
+      it "statusがpublishedとして保存される" do
         subject
         expect(Article.last.status).to eq("published")
-        binding.pry
         expect(response).to have_http_status(:ok)
       end
     end
 
-    #異常系テスト
+    # 異常系テスト
     context "tokenを渡していない時、記事が作成されない" do
       let(:status_params) { :draft }
       it "エラーが起きる" do
@@ -134,8 +130,6 @@ RSpec.describe "Article", type: :request do
         expect(res["errors"][0]).to eq "You need to sign in or sign up before continuing."
       end
     end
-
-
   end
 
   describe "PATCH /articles/:id" do
