@@ -4,15 +4,14 @@ module Api
       skip_before_action :authenticate_api_v1_user!, only: %i[index show]
 
       def index
-        articles = Article.where(status: :published).order(updated_at: :desc)
+        articles = Article.published.order(updated_at: :desc)
         render json: articles, each_serializer: Api::V1::ArticlePreviewSerializer
       end
 
       def show
-        article = Article.find(params[:id])
+        article = Article.published.find(params[:id])
         render json: article, serializer: Api::V1::ArticleSerializer
       end
-
       def create
         article = current_api_v1_user.articles.create!(article_params)
         render json: article, serializer: Api::V1::ArticleSerializer
