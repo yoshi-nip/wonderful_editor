@@ -6,6 +6,23 @@ RSpec.describe Article, type: :model do
     let(:article) { build(:article) }
     it "記事が作られる" do
       expect(article).to be_valid
+      expect(article.status).to eq "draft"
+    end
+  end
+
+  context "statusが下書き状態の時" do
+    let(:article) { build(:article, :draft) }
+    it "記事が作られる" do
+      expect(article).to be_valid
+      expect(article.status).to eq "draft"
+    end
+  end
+
+  context "statusが公開状態の時" do
+    let(:article) { build(:article, :published) }
+    it "記事が作られる" do
+      expect(article).to be_valid
+      expect(article.status).to eq "published"
     end
   end
 

@@ -36,7 +36,7 @@ RSpec.describe "Article", type: :request do
       it "記事詳細を取得" do
         p(subject)
         res = JSON.parse(response.body)
-        expect(res.keys).to eq ["id", "title", "body", "updated_at", "user"]
+        expect(res.keys).to eq ["id", "title", "body", "updated_at", "status", "user"]
         expect(res["id"]).to eq article.id
         expect(res["title"]).to eq article.title
         expect(res["body"]).to eq article.body
@@ -59,6 +59,7 @@ RSpec.describe "Article", type: :request do
 
     let(:user) { create(:user) }
     let(:article_params) { attributes_for(:article) }
+    # let(:article_params) { attributes_for(:article).merge(status: status_params) }
 
     context "ログインユーザーの時、適切なパラメータをもとに記事が作成される" do
       let!(:headers) { user.create_new_auth_token }
@@ -78,6 +79,7 @@ RSpec.describe "Article", type: :request do
       end
     end
 
+    # 異常系テスト
     context "tokenを渡していない時、記事が作成されない" do
       it "エラーが起きる" do
         subject
