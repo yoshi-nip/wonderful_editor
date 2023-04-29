@@ -26,6 +26,7 @@
   },
   "version": "0.1.0",
   "devDependencies": {
+    "@babel/plugin-proposal-class-static-block": "^7.21.0",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.0",
     "webpack-dev-server": "^3.11.0"
   }
