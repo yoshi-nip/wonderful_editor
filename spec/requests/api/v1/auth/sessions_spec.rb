@@ -9,17 +9,10 @@ RSpec.describe "Api::V1::Auth::Registrations", type: :request do
     subject { post(api_v1_user_session_path, params: user_params) }
 
     context "適切なパラメータが送信されたとき" do
-      # 登録してあるユーザーのemail,passwordを送信したらログインができる
-      # ログインしたらtoken情報が返ってくる
-      # パラメータが違かったらエラーが起きる
-      # パラメータがない場合エラーが起きる
       let(:user) { create(:user) }
       let(:user_params) { {  email: user.email, password: user.password } }
       it "ログインができる" do
         subject
-        # res = JSON.parse(response.body)
-        # expect(res["data"]["name"]).to eq user_params[:user][:name]
-        # expect(res["data"]["email"]).to eq user_params[:user][:email]
         expect(response).to have_http_status(:ok)
       end
 
@@ -30,14 +23,6 @@ RSpec.describe "Api::V1::Auth::Registrations", type: :request do
           expect(response.header[header_key]).to be_present
         end
       end
-
-      #   expect(response.header["token-type"]).to be_present
-      #   expect(response.header["access-token"]).to be_present
-      #   expect(response.header["client"]).to be_present
-      #   expect(response.header["uid"]).to be_present
-      #   expect(response.header["expiry"]).to be_present
-      #   expect(response.header).to have_http_status(:ok)
-      # end
     end
 
     context "余計なnameがある時" do
@@ -53,21 +38,16 @@ RSpec.describe "Api::V1::Auth::Registrations", type: :request do
     context "passwordがない時" do
       let(:user) { create(:user) }
       let(:user_params) { {  email: user.email, password: nil } }
-      # let(:user_params) { attributes_for(:user,name: nil) }
       it "エラーが返ってくる" do
         subject
         res = JSON.parse(response.body)
         expect(res["errors"]).to be_present
-        # subject
-        # # expect { subject }.to raise_error ActionController::ParameterMissing
-        # expect(response).to have_http_status(:unprocessable_entity)
       end
     end
 
     context "emailがない時" do
       let(:user) { create(:user) }
       let(:user_params) { {  email: nil, password: user.password } }
-      # let(:user_params) { attributes_for(:user,name: nil) }
       it "エラーが返ってくる" do
         expect { subject }.to raise_error NoMethodError
       end
@@ -81,23 +61,16 @@ RSpec.describe "Api::V1::Auth::Registrations", type: :request do
         subject
         res = JSON.parse(response.body)
         expect(res["errors"]).to be_present
-        # subject
-        # # expect { subject }.to raise_error ActionController::ParameterMissing
-        # expect(response).to have_http_status(:unprocessable_entity)
       end
     end
 
     context "emailが違う時" do
       let(:user) { create(:user) }
       let(:user_params) { {  email: "mineraruwater@mineraru.com", password: user.password } }
-      # let(:user_params) { attributes_for(:user,name: nil) }
       it "エラーが返ってくる" do
         subject
         res = JSON.parse(response.body)
         expect(res["errors"]).to be_present
-        # subject
-        # # expect { subject }.to raise_error ActionController::ParameterMissing
-        # expect(response).to have_http_status(:unprocessable_entity)
       end
     end
   end
@@ -109,9 +82,6 @@ RSpec.describe "Api::V1::Auth::Registrations", type: :request do
       let(:user) { create(:user) }
       let!(:headers) { user.create_new_auth_token }
       it "ログアウトが成功する" do
-        # ログイン状態を確認
-        # ログアウトのアクションを実行
-        # ログアウトの結果を確認
         expect { subject }.to change { user.reload.tokens.present? }.from(true).to(false)
         expect(response).to have_http_status(:ok) # ログアウト後のレスポンスステータスを確認
       end
@@ -128,10 +98,6 @@ RSpec.describe "Api::V1::Auth::Registrations", type: :request do
           "authorization" => "" }
       }
       it "ログアウトが失敗する" do
-        # ログイン状態を確認
-        # ログアウトのアクションを実行
-        # ログアウトの結果を確認
-        # expect {subject}.to change {user.reload.tokens.present?}.from(true).to(false)
         subject
         res = JSON.parse(response.body)
         expect(res["success"]).to eq false

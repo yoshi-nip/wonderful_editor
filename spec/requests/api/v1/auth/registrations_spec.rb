@@ -25,50 +25,35 @@ RSpec.describe "Api::V1::Auth::Registrations", type: :request do
           expect(response.header[header_key]).to be_present
         end
       end
-
-      #   expect(response.header["token-type"]).to be_present
-      #   expect(response.header["access-token"]).to be_present
-      #   expect(response.header["client"]).to be_present
-      #   expect(response.header["uid"]).to be_present
-      #   expect(response.header["expiry"]).to be_present
-      #   expect(response.header).to have_http_status(:ok)
-      # end
     end
 
     context "不適切なパラメータが送れた時" do
       let(:user_params) { attributes_for(:user) }
       it "エラーが返ってくる" do
-        # binding.pry
         expect { subject }.to raise_error ActionController::ParameterMissing
       end
     end
 
     context "nameがない時" do
       let(:user_params) { { user: attributes_for(:user, name: nil) } }
-      # let(:user_params) { attributes_for(:user,name: nil) }
       it "エラーが返ってくる" do
         subject
-        # expect { subject }.to raise_error ActionController::ParameterMissing
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
 
     context "emailがない時" do
       let(:user_params) { { user: attributes_for(:user, email: nil) } }
-      # let(:user_params) { attributes_for(:user,name: nil) }
       it "エラーが返ってくる" do
         subject
-        # expect { subject }.to raise_error ActionController::ParameterMissing
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
 
     context "passwordがない時" do
       let(:user_params) { { user: attributes_for(:user, password: nil) } }
-      # let(:user_params) { attributes_for(:user,name: nil) }
       it "エラーが返ってくる" do
         subject
-        # expect { subject }.to raise_error ActionController::ParameterMissing
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
