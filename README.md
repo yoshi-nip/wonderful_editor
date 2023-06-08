@@ -1,6 +1,10 @@
 # wonderful_editor
 学習用Qiita風デモアプリ
 
+# イメージ
+<img width="661" alt="デモイメージ" src="https://github.com/yoshi-nip/wonderful_editor/assets/53852040/1a7c2ea5-8045-4f94-86d7-cc94b180437e">
+
+
 # ツール・ライブラリの名前
 
 Ruby on Railsの学習のためQiitaを参考にしたデモアプリを作成しました。
