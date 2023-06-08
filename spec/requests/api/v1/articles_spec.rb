@@ -1,15 +1,10 @@
 require "rails_helper"
 
 RSpec.describe "Article", type: :request do
-  # users GET    /users(.:format)users#index {:format=>:json}
-  # ユーザー一覧が取得できる
-  # 返ってきたデータはname,account, emailを持つこと
-  # 正常なレスポンスコードか返ってきている
   describe "GET /articles" do
     subject { get(api_v1_articles_path) }
 
     context "記事がpublishedの時" do
-      # before { create_list(:article, 3) }
       let!(:article1) { create(:article, :published, updated_at: 1.days.ago) }
       let!(:article2) { create(:article, :published, updated_at: 2.days.ago) }
       let!(:article3) { create(:article, :published, title: "一番最初") }
@@ -17,18 +12,15 @@ RSpec.describe "Article", type: :request do
       it "記事の一覧を取得できる" do
         p(subject)
         res = JSON.parse(response.body)
-        # res.length = 3
         expect(res.length).to eq 3
         expect(res.map {|d| d["id"] }).to eq [article3.id, article1.id, article2.id]
         expect(res[0].keys).to eq ["id", "title", "body", "updated_at", "status", "user"]
         expect(res[0]["user"].keys).to eq ["id", "name", "email"]
-        # expect(res.keys).to eq ["id", "account", "name", "created_at", "updated_at", "email"]
         expect(response).to have_http_status(:ok)
       end
     end
 
     context "記事がdraftの時" do
-      # before { create_list(:article, 3) }
       let!(:article1) { create(:article, :draft, updated_at: 1.days.ago) }
       let!(:article2) { create(:article, :draft, updated_at: 2.days.ago) }
       let!(:article3) { create(:article, :draft, title: "一番最初") }
@@ -84,13 +76,10 @@ RSpec.describe "Article", type: :request do
     subject { post(api_v1_articles_path, params: { article: article_params }, headers:) }
 
     let(:user) { create(:user) }
-    # let(:article_draft_or_published) {{draft: attributes_for(:article,:draft),published: attributes_for(:article,:published),fff: }}
-    # let(:article_params) { attributes_for(:article).merge(status: status_params) }
 
     context "ログインユーザーの時、適切なパラメータをもとに記事が作成される" do
       let!(:headers) { user.create_new_auth_token }
       let(:article_params) { attributes_for(:article, :draft) }
-      # before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_api_v1_user).and_return(user) }
       it "現在のユーザをもとに記事が作成できる" do
         subject
         expect(Article.last.user_id).to eq(user.id)
@@ -110,7 +99,6 @@ RSpec.describe "Article", type: :request do
     context "公開ステータスの時も正常に保存できる" do
       let!(:headers) { user.create_new_auth_token }
       let(:article_params) { attributes_for(:article, :published) }
-      # before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_api_v1_user).and_return(user) }
       it "正常に保存できる" do
         subject
         expect(Article.last.user_id).to eq(user.id)
@@ -119,7 +107,6 @@ RSpec.describe "Article", type: :request do
       end
     end
 
-    # 異常系テスト
     context "tokenを渡していない時、記事が作成されない" do
       let(:article_params) { attributes_for(:article, :published) }
       it "エラーが起きる" do
@@ -143,7 +130,6 @@ RSpec.describe "Article", type: :request do
       it "エラーが起きる" do
         subject
         res = JSON.parse(response.body)
-        # expect(response).to have_http_status(:unauthorized)
         expect(res["errors"][0]).to eq "You need to sign in or sign up before continuing."
       end
     end
@@ -166,17 +152,13 @@ RSpec.describe "Article", type: :request do
     let(:article_params) { attributes_for(:article, :published) }
     let(:article_id) { article.id }
     let(:user) { { user: create(:user), other_user: create(:user) } }
-    # let(:other_user) { create(:user) }
-    # let(:user) { create(:user) }
-    # before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_api_v1_user).and_return(user) }
 
     context "自分が所持している記事のレコードを更新するとき" do
       let!(:headers) { user[:user].create_new_auth_token }
       let!(:article) { create(:article, :draft, user: user[:user]) }
 
       it "記事が更新できる(下書き>公開)" do
-        # post :create, params: { article: { title: "Test Article", body: "Lorem ipsum dolor sit amet" } }
-        # タイトルだけ変える想定
+        # タイトルだけ変える
         expect { subject }.to change { article.reload.title }.from(article.title).to(article_params[:title]) &
                               change { article.reload.body }.from(article.body).to(article_params[:body]) &
                               change { article.reload.status }.from(article.status).to(article_params[:status].to_s)
@@ -227,7 +209,6 @@ RSpec.describe "Article", type: :request do
     let(:other_user) { create(:user) }
     let(:user) { create(:user) }
     let!(:headers) { user.create_new_auth_token }
-    # before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_api_v1_user).and_return(user) }
 
     context "自分が所持している記事を削除しようとするとき" do
       let(:article) { create(:article, user:) }
