@@ -6,7 +6,6 @@ module Api
 
           def sign_up_params
             params.require(:user).permit(:name, :email, :password, :password_confirmation)
-            # params.require(:registration).permit(:email, :password)
           end
 
           def account_update_params
