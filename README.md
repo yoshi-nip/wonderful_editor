@@ -1,5 +1,5 @@
 # wonderful_editor
-学習用Qiita風デモアプリ
+Qiita風デモアプリ
 
 # イメージ
 <img width="1440" alt="スクリーンショット 2023-06-08 13 19 34" src="https://github.com/yoshi-nip/wonderful_editor/assets/53852040/f22fc345-7c54-4340-94fb-4b361ce0a789">
